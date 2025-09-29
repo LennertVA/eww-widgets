@@ -1,0 +1,120 @@
+;; **
+;; ** Widgets config for EWW
+;; ** Created by : @LennertVA
+;; **
+
+;; ** Variables ***********************************************************************
+
+(defpoll MHZ :interval "1s" `/home/alver/Build/eww-widgets/system-monitor/scripts/eww.sh --mhz`)
+(defpoll HST :interval "1h" `hostname`)
+
+
+;; ** Widgets *************************************************************************
+
+; system
+(defwidget system []
+    (box 
+        :class "gkrellm"
+        :orientation "v" 
+        :space-evenly false 
+        :spacing 2
+            (label
+                :class "header"
+                :text {HST} 
+                :xalign 0.5
+            ) 
+            (box 
+                :class "grid"
+                :height 161
+                    (graph 
+                        :style "color: rgba(255,255,255,128);"
+                        :value {EWW_CPU.avg} 
+                        :max 16 
+                        :time-range "200s" 
+                        :line-style "round" 
+                    )
+            )
+            (overlay
+                (label 
+                    :text "CPU max:"
+                    :xalign 0 
+                )
+                (label 
+                    :text "${search(MHZ, '\\d+')[0]} MHZ"
+                    :xalign 1 
+                )
+            )
+            (overlay
+                (label 
+                    :text "CPU avg:"
+                    :xalign 0 
+                )
+                (label
+                    :text "${search(MHZ, '\\d+')[1]} MHZ"
+                    :xalign 1
+                )
+            )
+            (overlay
+                (label
+                    :text "CPU temp:"
+                    :xalign 0
+                ) 
+                (label
+                    :text "${round(EWW_TEMPS.K10TEMP_TCCD1, 0)}°C"
+                    :xalign 1
+                )
+            )
+            (overlay
+                (box 
+                    :class "grid"
+                    :height 161
+                        (graph 
+                            :style "color: rgba(0,255,0,128);"
+                            :value {EWW_NET.wlp12s0.NET_DOWN}
+                            :dynamic false
+                            :time-range "200s" 
+                            :line-style "round" 
+                            :thickness 1.5
+                            :max 80000000
+                        )
+                )
+                (box 
+                    :height 161
+                        (graph 
+                            :style "color: rgba(255,0,0,128);"
+                            :value {EWW_NET.wlp12s0.NET_UP}
+                            :dynamic false
+                            :time-range "200s" 
+                            :line-style "round" 
+                            :thickness 1.5
+                            :max 80000000
+                        )
+                )
+            )
+            (label 
+                :text "wlp12s0 ⬆ ${round(EWW_NET.wlp12s0.NET_UP / 1048576, 2)}MBps"
+                :xalign 0 
+            )
+            (label 
+                :text "wlp12s0 ⬇ ${round(EWW_NET.wlp12s0.NET_DOWN / 1048576, 2)}MBps"
+                :xalign 0 
+            )
+    )
+)
+
+
+;; ** Windows *************************************************************************
+
+;; system
+(defwindow system
+           :monitor 0
+           :geometry (geometry :x "2840px"
+                               :y "50px"
+                               :width "200px"
+                               :height "600px"
+                               :anchor "top left")
+           :stacking "fg"
+           :reserve (struts :distance "80px" :side "top")
+           :windowtype "dock"
+           :wm-ignore false
+(system))
