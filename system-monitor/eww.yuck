@@ -5,8 +5,9 @@
 
 ;; ** Variables ***********************************************************************
 
-(defpoll MHZ :interval "1s" `/home/alver/Build/eww-widgets/system-monitor/scripts/eww.sh --mhz`)
-(defpoll HST :interval "1h" `hostname`)
+(defpoll MHZ :interval "1s" `scripts/eww.sh --mhz`)
+(defpoll HST :interval "24h" `hostname`)
+(defpoll UPT :interval "1s" `uptime`)
 
 
 ;; ** Widgets *************************************************************************
@@ -18,29 +19,33 @@
         :orientation "v" 
         :space-evenly false 
         :spacing 2
-            (label
-                :class "header"
-                :text {HST} 
-                :xalign 0.5
-            ) 
-            (box 
-                :class "grid"
-                :height 161
-                    (graph 
-                        :style "color: rgba(255,255,255,128);"
-                        :value {EWW_CPU.avg} 
-                        :max 16 
-                        :time-range "200s" 
-                        :line-style "round" 
-                    )
-            )
+        (label
+            :class "header"
+            :text {HST} 
+            :xalign 0.5
+        ) 
+        (box 
+            :class "grid"
+            :height 161
+                (graph 
+                    :style "color: rgba(255,255,255,128);"
+                    :value {EWW_CPU.avg} 
+                    :max 16 
+                    :time-range "200s" 
+                    :line-style "round" 
+                )
+        )
+        (box
+            :style "padding: 10px 0px"
+            :orientation "v" 
+            :space-evenly false 
             (overlay
                 (label 
                     :text "CPU max:"
                     :xalign 0 
                 )
                 (label 
-                    :text "${search(MHZ, '\\d+')[0]} MHZ"
+                    :text "${search(MHZ, '\\d+')[0]} MHz"
                     :xalign 1 
                 )
             )
@@ -50,7 +55,7 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${search(MHZ, '\\d+')[1]} MHZ"
+                    :text "${search(MHZ, '\\d+')[1]} MHz"
                     :xalign 1
                 )
             )
@@ -64,41 +69,107 @@
                     :xalign 1
                 )
             )
+        )
+        (overlay
+            (box 
+                :class "grid"
+                :height 161
+                    (graph 
+                        :style "color: rgba(0,255,0,128);"
+                        :value {EWW_NET.wlp12s0.NET_DOWN}
+                        :dynamic false
+                        :time-range "200s" 
+                        :line-style "round" 
+                        :thickness 1.5
+                        :max 80000000
+                    )
+            )
+            (box 
+                :height 161
+                    (graph 
+                        :style "color: rgba(255,0,0,128);"
+                        :value {EWW_NET.wlp12s0.NET_UP}
+                        :dynamic false
+                        :time-range "200s" 
+                        :line-style "round" 
+                        :thickness 1.5
+                        :max 80000000
+                    )
+            )
+        )
+        (box
+            :style "padding-top: 10px"
+            :orientation "v" 
+            :space-evenly false 
             (overlay
-                (box 
-                    :class "grid"
-                    :height 161
-                        (graph 
-                            :style "color: rgba(0,255,0,128);"
-                            :value {EWW_NET.wlp12s0.NET_DOWN}
-                            :dynamic false
-                            :time-range "200s" 
-                            :line-style "round" 
-                            :thickness 1.5
-                            :max 80000000
-                        )
+                (label 
+                    :text "wlp12s0 ⬆"
+                    :xalign 0 
                 )
-                (box 
-                    :height 161
-                        (graph 
-                            :style "color: rgba(255,0,0,128);"
-                            :value {EWW_NET.wlp12s0.NET_UP}
-                            :dynamic false
-                            :time-range "200s" 
-                            :line-style "round" 
-                            :thickness 1.5
-                            :max 80000000
-                        )
+                (label
+                    :text "${round(EWW_NET.wlp12s0.NET_UP / 1048576, 2)}MBps"
+                    :xalign 1
                 )
             )
-            (label 
-                :text "wlp12s0 ⬆ ${round(EWW_NET.wlp12s0.NET_UP / 1048576, 2)}MBps"
-                :xalign 0 
+            (overlay                    
+                (label 
+                    :text "wlp12s0 ⬇"
+                    :xalign 0 
+                )
+                (label
+                    :text "${round(EWW_NET.wlp12s0.NET_DOWN / 1048576, 2)}MBps"
+                    :xalign 1
+                )
+            )                
+        )
+        (box
+            :orientation "v" 
+            :space-evenly false 
+            (overlay
+                (label 
+                    :text "RAM"
+                    :xalign 0 
+                )
+                (label
+                    :text "${round(EWW_RAM.used_mem / 1073741824, 1)}GB of ${round(EWW_RAM.total_mem / 1073741824, 1)}GB"
+                    :xalign 1
+                )
             )
-            (label 
-                :text "wlp12s0 ⬇ ${round(EWW_NET.wlp12s0.NET_DOWN / 1048576, 2)}MBps"
-                :xalign 0 
+            (overlay
+                (label 
+                    :text "Swap"
+                    :xalign 0 
+                )
+                (label
+                    :text "${round((EWW_RAM.total_swap - EWW_RAM.free_swap) / 1073741824, 1)}GB of ${round(EWW_RAM.total_swap / 1073741824, 1)}GB"
+                    :xalign 1
+                )
             )
+        )
+        (box
+            :orientation "v" 
+            :space-evenly false 
+            (overlay
+                (label 
+                    :text "Uptime"
+                    :xalign 0 
+                )
+                (label
+                    :text "${search(UPT, '^[^,]*')[0]}"
+                    :xalign 1
+                )
+            )
+            (overlay
+                (label 
+                    :text "Load"
+                    :xalign 0 
+                )
+                (label
+                    :text "${search(UPT, '[^:]+$')[0]}" 
+                    :xalign 1
+                )
+            )
+        )
     )
 )
 
