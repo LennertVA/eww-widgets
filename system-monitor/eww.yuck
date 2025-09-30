@@ -9,6 +9,33 @@
 (defpoll HST :interval "24h" `hostname`)
 (defpoll UPT :interval "1s" `uptime`)
 
+;; Average CPU frequency is green until
+(defvar MHZ_GRN "2500")
+;; Average CPU frequency is red from
+(defvar MHZ_RED "4000")
+;; Used memory percentage is green until (0.0-1.0)
+(defvar MEM_GRN "0.5")
+;; Used memory percentage is red from (0.0-1.0)
+(defvar MEM_RED "0.8")
+;; Free swap percentage is green until (0.0-1.0)
+(defvar SWP_GRN "0.5")
+;; Free swap percentage is green until (0.0-1.0)
+(defvar SWP_RED "0.2")
+;; CPU temp is green until
+(defvar TMP_GRN "40")
+;; CPU temp is red from
+(defvar TMP_RED "60")
+;; Load is green until
+(defvar ULD_GRN "1")
+;; Load is red from
+(defvar ULD_RED "8")
+
+(defvar GREEN "rgba(0,220,0,0.6)")
+(defvar ORANGE "rgba(235,149,52,0.6)")
+(defvar RED "rgba(220,0,0,0.6)")
+
+(defvar NET_DEV "wlp12s0")
+
 
 ;; ** Widgets *************************************************************************
 
@@ -28,7 +55,7 @@
             :class "grid"
             :height 161
                 (graph 
-                    :style "color: rgba(255,255,255,128);"
+                    :style "color: rgba(255,255,255,0.5);"
                     :value {EWW_CPU.avg} 
                     :max 16 
                     :time-range "200s" 
@@ -57,7 +84,7 @@
                 (label
                     :text "${search(MHZ, '\\d+')[1]} MHz  "
                     :class "right"
-                    :style "color: ${search(MHZ, '\\d+')[1] < 2500 ? '#00ff00' : search(MHZ, '\\d+')[1] < 4000 ? '#eb9234' : '#ff0000'};"
+                    :style "color: ${search(MHZ, '\\d+')[1] < MHZ_GRN ? GREEN : search(MHZ, '\\d+')[1] < MHZ_RED ? ORANGE : RED};"
                     :xalign 1
                 )
             )
@@ -69,7 +96,7 @@
                 (label
                     :text "${round(EWW_TEMPS.K10TEMP_TCCD1, 0)}°C  "
                     :class "right"
-                    :style "color: ${EWW_TEMPS.K10TEMP_TCCD1 < 40 ? '#00ff00' : EWW_TEMPS.K10TEMP_TCCD1 <60 ? '#eb9234' : '#ff0000'};"
+                    :style "color: ${EWW_TEMPS.K10TEMP_TCCD1 < TMP_GRN ? GREEN : EWW_TEMPS.K10TEMP_TCCD1 < TMP_RED ? ORANGE : RED};"
                     :xalign 1
                 )
             )
@@ -79,7 +106,7 @@
                 :class "grid"
                 :height 161
                     (graph 
-                        :style "color: rgba(0,255,0,128);"
+                        :style "color: rgba(0,255,0,0.5);"
                         :value {EWW_NET.wlp12s0.NET_DOWN}
                         :dynamic false
                         :time-range "200s" 
@@ -91,7 +118,7 @@
             (box 
                 :height 161
                     (graph 
-                        :style "color: rgba(255,0,0,128);"
+                        :style "color: rgba(255,0,0,0.5);"
                         :value {EWW_NET.wlp12s0.NET_UP}
                         :dynamic false
                         :time-range "200s" 
@@ -139,7 +166,7 @@
                 (label
                     :text "${round(EWW_RAM.used_mem / 1073741824, 1)}GB of ${round(EWW_RAM.total_mem / 1073741824, 1)}GB  "
                     :class "right"
-                    :style "color: ${(EWW_RAM.used_mem/EWW_RAM.total_mem) < 0.50 ? '#00ff00' : (EWW_RAM.used_mem/EWW_RAM.total_mem) < 0.80 ? '#eb9234' : '#ff0000'};"
+                    :style "color: ${(EWW_RAM.used_mem/EWW_RAM.total_mem) < MEM_GRN ? GREEN : (EWW_RAM.used_mem/EWW_RAM.total_mem) < MEM_RED ? ORANGE : RED};"
                     :xalign 1
                 )
             )
@@ -151,7 +178,7 @@
                 (label
                     :text "${round((EWW_RAM.total_swap - EWW_RAM.free_swap) / 1073741824, 1)}GB of ${round(EWW_RAM.total_swap / 1073741824, 1)}GB  "
                     :class "right"
-                    :style "color: ${(EWW_RAM.free_swap/EWW_RAM.total_swap) > 0.50 ? '#00ff00' : (EWW_RAM.free_swap/EWW_RAM.total_swap) > 0.20 ? '#eb9234' : '#ff0000'};"
+                    :style "color: ${(EWW_RAM.free_swap/EWW_RAM.total_swap) > SWP_GRN ? GREEN : (EWW_RAM.free_swap/EWW_RAM.total_swap) > SWP_RED ? ORANGE : RED};"
                     :xalign 1
                 )
             )
@@ -178,7 +205,7 @@
                 (label
                     :text "${search(UPT, '[^:]+$')[0]}  " 
                     :class "right"
-                    :style "color: ${search(search(UPT, '[^:]+$')[0], '\\d+')[0] < 1 ? '#00ff00' : search(search(UPT, '[^:]+$')[0], '\\d+')[0] < 8 ? '#eb9234' : '#ff0000'};"
+                    :style "color: ${search(search(UPT, '[^:]+$')[0], '\\d+')[0] < ULD_GRN ? GREEN : search(search(UPT, '[^:]+$')[0], '\\d+')[0] < ULD_RED ? ORANGE : RED};"
                     :xalign 1
                 )
             )
@@ -191,14 +218,14 @@
 
 ;; system
 (defwindow system
-           :monitor 0
-           :geometry (geometry :x "2840px"
-                               :y "50px"
-                               :width "200px"
-                               :height "600px"
-                               :anchor "top left")
-           :stacking "fg"
-           :reserve (struts :distance "80px" :side "top")
-           :windowtype "dock"
-           :wm-ignore false
+    :monitor 0
+    :geometry (geometry :x "2840px"
+        :y "50px"
+        :width "200px"
+        :height "600px"
+        :anchor "top left")
+    :stacking "bg"
+    :windowtype "dock"
+    :wm-ignore true
+    :focusable "none"    
 (system))
