@@ -45,7 +45,7 @@
                     :xalign 0 
                 )
                 (label 
-                    :text "${search(MHZ, '\\d+')[0]} MHz"
+                    :text "${search(MHZ, '\\d+')[0]} MHz  "
                     :xalign 1 
                 )
             )
@@ -55,7 +55,9 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${search(MHZ, '\\d+')[1]} MHz"
+                    :text "${search(MHZ, '\\d+')[1]} MHz  "
+                    :class "right"
+                    :style "color: ${search(MHZ, '\\d+')[1] < 2500 ? '#00ff00' : search(MHZ, '\\d+')[1] < 4000 ? '#eb9234' : '#ff0000'};"
                     :xalign 1
                 )
             )
@@ -65,7 +67,9 @@
                     :xalign 0
                 ) 
                 (label
-                    :text "${round(EWW_TEMPS.K10TEMP_TCCD1, 0)}°C"
+                    :text "${round(EWW_TEMPS.K10TEMP_TCCD1, 0)}°C  "
+                    :class "right"
+                    :style "color: ${EWW_TEMPS.K10TEMP_TCCD1 < 40 ? '#00ff00' : EWW_TEMPS.K10TEMP_TCCD1 <60 ? '#eb9234' : '#ff0000'};"
                     :xalign 1
                 )
             )
@@ -107,7 +111,8 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${round(EWW_NET.wlp12s0.NET_UP / 1048576, 2)}MBps"
+                    :text "${round(EWW_NET.wlp12s0.NET_UP / 1048576, 2)}MBps  "
+                    :class "right"
                     :xalign 1
                 )
             )
@@ -117,7 +122,8 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${round(EWW_NET.wlp12s0.NET_DOWN / 1048576, 2)}MBps"
+                    :text "${round(EWW_NET.wlp12s0.NET_DOWN / 1048576, 2)}MBps  "
+                    :class "right"
                     :xalign 1
                 )
             )                
@@ -131,7 +137,9 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${round(EWW_RAM.used_mem / 1073741824, 1)}GB of ${round(EWW_RAM.total_mem / 1073741824, 1)}GB"
+                    :text "${round(EWW_RAM.used_mem / 1073741824, 1)}GB of ${round(EWW_RAM.total_mem / 1073741824, 1)}GB  "
+                    :class "right"
+                    :style "color: ${(EWW_RAM.used_mem/EWW_RAM.total_mem) < 0.50 ? '#00ff00' : (EWW_RAM.used_mem/EWW_RAM.total_mem) < 0.80 ? '#eb9234' : '#ff0000'};"
                     :xalign 1
                 )
             )
@@ -141,7 +149,9 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${round((EWW_RAM.total_swap - EWW_RAM.free_swap) / 1073741824, 1)}GB of ${round(EWW_RAM.total_swap / 1073741824, 1)}GB"
+                    :text "${round((EWW_RAM.total_swap - EWW_RAM.free_swap) / 1073741824, 1)}GB of ${round(EWW_RAM.total_swap / 1073741824, 1)}GB  "
+                    :class "right"
+                    :style "color: ${(EWW_RAM.free_swap/EWW_RAM.total_swap) > 0.50 ? '#00ff00' : (EWW_RAM.free_swap/EWW_RAM.total_swap) > 0.20 ? '#eb9234' : '#ff0000'};"
                     :xalign 1
                 )
             )
@@ -155,7 +165,8 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${search(UPT, '^[^,]*')[0]}"
+                    :text "${search(UPT, '^[^,]*')[0]}  "
+                    :class "right"
                     :xalign 1
                 )
             )
@@ -165,7 +176,9 @@
                     :xalign 0 
                 )
                 (label
-                    :text "${search(UPT, '[^:]+$')[0]}" 
+                    :text "${search(UPT, '[^:]+$')[0]}  " 
+                    :class "right"
+                    :style "color: ${search(search(UPT, '[^:]+$')[0], '\\d+')[0] < 1 ? '#00ff00' : search(search(UPT, '[^:]+$')[0], '\\d+')[0] < 8 ? '#eb9234' : '#ff0000'};"
                     :xalign 1
                 )
             )
